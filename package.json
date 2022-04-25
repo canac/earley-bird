@@ -36,8 +36,9 @@
     "prepublishOnly": "npm run build",
     "prettier": "prettier . --write",
     "publish-test": "vitest run",
-    "release": "np --test-script publish-test",
-    "test": "vitest"
+    "release": "np",
+    "test": "vitest run",
+    "test-watch": "vitest"
   },
   "dependencies": {
     "commander": "^9.2.0",
