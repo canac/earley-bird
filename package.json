@@ -1,0 +1,59 @@
+{
+  "name": "@canac/earley-bird",
+  "version": "0.0.0",
+  "description": "Earley parser inspired by Nearley and rewritten from scratch",
+  "keywords": [],
+  "homepage": "https://github.com/canac/earley-bird#readme",
+  "bugs": {
+    "url": "https://github.com/canac/earley-bird/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/canac/earley-bird.git"
+  },
+  "license": "MIT",
+  "author": "Caleb Cox <canac@users.noreply.github.com>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "earley-bird": "dist/cli/index.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/cli/index.ts --format esm,cjs --target es2022 --dts --clean",
+    "build-watch": "npm run build -- --watch",
+    "prepublishOnly": "npm run build",
+    "prettier": "prettier . --write",
+    "publish-test": "vitest run",
+    "release": "np --test-script publish-test",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "commander": "^9.2.0",
+    "moo": "^0.5.1",
+    "nearley": "2.20.1",
+    "prettier": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/moo": "^0.5.5",
+    "@types/node": "^17.0.26",
+    "@types/prettier": "^2.6.0",
+    "np": "^7.6.1",
+    "prettier-plugin-organize-imports": "^2.3.4",
+    "prettier-plugin-packagejson": "^2.2.17",
+    "tsup": "^5.12.6",
+    "vite": "^2.9.5",
+    "vitest": "^0.9.4"
+  }
+}
