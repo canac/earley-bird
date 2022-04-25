@@ -1,6 +1,6 @@
 {
   "name": "@canac/earley-bird",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Earley parser inspired by Nearley and rewritten from scratch",
   "keywords": [],
   "homepage": "https://github.com/canac/earley-bird#readme",
