@@ -40,6 +40,11 @@
     "test": "vitest run",
     "test-watch": "vitest"
   },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
   "dependencies": {
     "commander": "^9.2.0",
     "nearley": "2.20.1",
@@ -49,6 +54,7 @@
     "@types/moo": "^0.5.5",
     "@types/node": "^17.0.26",
     "@types/prettier": "^2.6.0",
+    "cz-conventional-changelog": "^3.3.0",
     "moo": "^0.5.1",
     "np": "^7.6.1",
     "prettier-plugin-organize-imports": "^2.3.4",
