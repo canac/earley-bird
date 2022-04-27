@@ -25,7 +25,9 @@ describe("Parser examples", () => {
     const parser = await generateParser("whitespace.ne");
     expect(parser.parse("(x)")).toEqual({
       success: true,
+      ambiguous: false,
       result: [[["(", null, [[[["x"]]]], null, ")"]]],
+      additionalResults: [],
     });
   });
 
@@ -39,33 +41,44 @@ describe("Parser examples", () => {
       "<<[([])]>([(<>[]{}{}<>())[{}[][]{}{}[]<>[]{}<>{}<>[]<>{}()][[][][]()()()]({})<[]>{(){}()<>}(<>[])]())({})>",
     ];
     passCases.forEach((passCase) => {
-      expect(parser.parse(passCase).success).toBe(true);
+      expect(parser.parse(passCase)).toMatchObject({
+        success: true,
+        ambiguous: false,
+      });
     });
 
-    const failCases = [
-      " ",
-      "[}",
-      "[(){}><]",
-      "(((())))(()))",
-      "",
-      "((((())))(())()",
-    ];
-    failCases.forEach((failCase) => {
-      expect(parser.parse(failCase).success).toBe(false);
+    const invalidCases = [" ", "[}", "[(){}><]", "(((())))(()))"];
+    invalidCases.forEach((invalidCase) => {
+      expect(parser.parse(invalidCase)).toEqual({
+        success: false,
+        failureType: "invalid",
+      });
+    });
+
+    const incompleteCases = ["", "((((())))(())()"];
+    incompleteCases.forEach((incompleteCase) => {
+      expect(parser.parse(incompleteCase)).toMatchObject({
+        success: false,
+        failureType: "incomplete",
+      });
     });
   });
 
   test("tokens", async () => {
     const parser = await generateParser("token.ne");
-    expect(parser.parse([123, 456, " ", 789])).toEqual({
+    expect(parser.parse([123, 456, " ", 789])).toMatchObject({
       success: true,
+      ambiguous: false,
       result: [123, [[456, " ", 789]]],
     });
   });
 
   test("tokens 2", async () => {
     const parser = await generateParser("token-2.ne");
-    expect(parser.parse(["print", "blah", 12, ";", ";"]).success).toBe(false);
+    expect(parser.parse(["print", "blah", 12, ";", ";"])).toMatchObject({
+      success: false,
+      failureType: "invalid",
+    });
   });
 
   test("json", async () => {
@@ -76,10 +89,16 @@ describe("Parser examples", () => {
       '{ "a" : true, "b" : "䕧⡱a\\\\\\"b\\u4567\\u2871䕧⡱\\t\\r\\f\\b\\n\\u0010\\u001f\\u005b\\u005c\\u005d", "c" : null, "d" : [null, true, false, -0.2345E+10] }\n',
     ];
     testCases.forEach((testCase) => {
-      expect(parser.parse(testCase)).toEqual({
+      expect(parser.parse(testCase)).toMatchObject({
         success: true,
+        ambiguous: false,
         result: JSON.parse(testCase),
       });
+    });
+
+    expect(parser.parse("foo")).toMatchObject({
+      success: false,
+      failureType: "lexer",
     });
   });
 
@@ -89,8 +108,9 @@ describe("Parser examples", () => {
       parser.parse(
         "set foo to 2 * e^ of ( foo * -0.05 + 0.5) * (1 - e ^ of (foo * -0.05 + 0.5))"
       )
-    ).toEqual({
+    ).toMatchObject({
       success: true,
+      ambiguous: false,
       result: [
         "setVar:to:",
         "foo",

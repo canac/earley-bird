@@ -10,6 +10,32 @@ import {
 } from "./symbols";
 import { ParseChart } from "./table";
 
+type ParseResult =
+  | {
+      // Successful parse
+      success: true;
+      ambiguous: boolean;
+      result: unknown;
+      additionalResults: unknown[];
+    }
+  | {
+      // More tokens could produce a successful parse
+      success: false;
+      failureType: "incomplete";
+      predictions: string[];
+    }
+  | {
+      // An invalid token was encountered and no more tokens can produce a successful parse
+      success: false;
+      failureType: "invalid";
+    }
+  | {
+      // The lexer couldn't parse the token
+      success: false;
+      failureType: "lexer";
+      lexerError: Error;
+    };
+
 // This class represents an Earley parser
 export class Parser {
   #grammar: Grammar;
@@ -22,20 +48,32 @@ export class Parser {
   }
 
   // Parse the provided input string
-  parse(
-    input: string
-  ):
-    | { success: true; result: unknown }
-    | { success: false; predictions: string[] } {
+  parse(input: string): ParseResult {
     const parseChart = new ParseChart(this.#grammar);
 
     // Feed the input to the lexer
     this.#lexer.reset(input);
 
+    let tokens;
+    try {
+      tokens = [...this.#lexer, null].entries();
+    } catch (err) {
+      if (err instanceof Error) {
+        return { success: false, failureType: "lexer", lexerError: err };
+      } else {
+        throw new Error("Unexpected lexer error");
+      }
+    }
+
     // Iterate over the lexer's tokens and one extra time because one more
     // parse table is created than tokens
-    for (const [tableIndex, token] of [...this.#lexer, null].entries()) {
+    for (const [tableIndex, token] of tokens) {
       const currentTable = parseChart.getTable(tableIndex);
+
+      if (currentTable.getStates().length === 0) {
+        return { success: false, failureType: "invalid" };
+      }
+
       currentTable.iterateStates((state) => {
         const expected = state.nextExpected();
 
@@ -88,14 +126,20 @@ export class Parser {
     if (successStates.length > 0) {
       // Only return the result of the first parse
       // If the parse was ambiguous, there might be multiple results
+      const [result, ...additionalResults] = successStates.map((state) =>
+        state.getResult()
+      );
       return {
         success: true,
-        result: successStates[0].getResult(),
+        ambiguous: successStates.length > 1,
+        result,
+        additionalResults,
       };
     }
 
     return {
       success: false,
+      failureType: "incomplete",
       predictions: parseChart.getPredictions(),
     };
   }
