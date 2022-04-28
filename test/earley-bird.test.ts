@@ -3,8 +3,9 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import { compile } from "../src/compiler/compile";
+import { Parser } from "../src/index";
 
-async function generateParser(grammarFilename) {
+async function generateParser(grammarFilename: string): Promise<Parser> {
   const inputFilename = resolve(
     fileURLToPath(import.meta.url),
     `../grammars/${grammarFilename}`
@@ -16,7 +17,9 @@ async function generateParser(grammarFilename) {
   // Replace the .ne extension with .js
   const outputFilename = inputFilename.slice(0, -2) + "js";
   await writeFile(outputFilename, output);
-  const { default: parser } = await import(outputFilename);
+  const { default: parser } = (await import(outputFilename)) as {
+    default: Parser;
+  };
   return parser;
 }
 

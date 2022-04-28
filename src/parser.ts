@@ -1,5 +1,5 @@
 import { Grammar } from "./grammar";
-import { Lexer, StreamLexer } from "./lexer";
+import { Lexer, StreamLexer, ToString } from "./lexer";
 import { State } from "./state";
 import {
   CharsetSymbol,
@@ -47,8 +47,8 @@ export class Parser {
     this.#lexer = lexer || new StreamLexer();
   }
 
-  // Parse the provided input string
-  parse(input: string): ParseResult {
+  // Parse the provided input string or iterable of tokens
+  parse(input: Iterable<ToString>): ParseResult {
     const parseChart = new ParseChart(this.#grammar);
 
     // Feed the input to the lexer

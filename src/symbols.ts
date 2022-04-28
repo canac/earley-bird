@@ -3,7 +3,7 @@ import { LexerToken } from "./lexer";
 // This interface represents a symbol in a rule
 export interface EarleySymbol {
   // Test whether a lexer token satisfies this symbol
-  matchesToken(tokenValue: string, token: LexerToken): boolean;
+  matchesToken(tokenValue: unknown, token: LexerToken): boolean;
 
   // Test whether a rule satisfies this symbol
   matchesRule(ruleName: string): boolean;
@@ -20,7 +20,7 @@ export class RuleSymbol implements EarleySymbol {
     this.#ruleName = ruleName;
   }
 
-  matchesToken(tokenValue: string, token: LexerToken): boolean {
+  matchesToken(tokenValue: unknown, token: LexerToken): boolean {
     return false;
   }
 
@@ -46,7 +46,7 @@ export class TokenSymbol implements EarleySymbol {
     this.#lexerTokenName = lexerTokenName;
   }
 
-  matchesToken(tokenValue: string, token: LexerToken): boolean {
+  matchesToken(tokenValue: unknown, token: LexerToken): boolean {
     return token.type === this.#lexerTokenName;
   }
 
@@ -68,7 +68,7 @@ export class LiteralSymbol implements EarleySymbol {
     this.#literal = literal;
   }
 
-  matchesToken(tokenValue: string, token: LexerToken): boolean {
+  matchesToken(tokenValue: unknown, token: LexerToken): boolean {
     return token.value === this.#literal;
   }
 
@@ -89,7 +89,7 @@ export class CharsetSymbol implements EarleySymbol {
     this.#pattern = pattern;
   }
 
-  matchesToken(tokenValue: string, token: LexerToken): boolean {
+  matchesToken(tokenValue: unknown, token: LexerToken): boolean {
     return this.#pattern.test(token.text);
   }
 
@@ -102,7 +102,7 @@ export class CharsetSymbol implements EarleySymbol {
   }
 }
 
-export type Tester = (tokenValue: string, token: LexerToken) => boolean;
+export type Tester = (tokenValue: unknown, token: LexerToken) => boolean;
 
 // This class represents a symbol that is satisfied by a test function
 export class TesterSymbol implements EarleySymbol {
@@ -112,7 +112,7 @@ export class TesterSymbol implements EarleySymbol {
     this.#tester = tester;
   }
 
-  matchesToken(tokenValue: string, token: LexerToken): boolean {
+  matchesToken(tokenValue: unknown, token: LexerToken): boolean {
     return this.#tester(tokenValue, token);
   }
 
