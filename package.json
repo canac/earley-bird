@@ -60,7 +60,7 @@
     "prettier-plugin-organize-imports": "^2.3.4",
     "prettier-plugin-packagejson": "^2.2.17",
     "tsup": "^5.12.6",
-    "vite": "^2.9.5",
-    "vitest": "^0.9.4"
+    "vite": "^5.4.6",
+    "vitest": "^2.1.1"
   }
 }
